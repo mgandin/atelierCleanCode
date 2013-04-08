@@ -1,4 +1,4 @@
-package com.octo.training.cmoment;
+package com.octo.training.coment;
 
 import java.io.FileInputStream;
 import java.io.IOException;

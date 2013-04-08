@@ -1,4 +1,4 @@
-package com.octo.training.cmoment;
+package com.octo.training.coment;
 
 import com.octo.training.object.Internaute;
 

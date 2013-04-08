@@ -19,7 +19,7 @@
 // fonction invoqu�e
 // suppression affectation locales des identifiant servlet
 // ----------------------------------------------------------------------------79
-package com.octo.training.cmoment;
+package com.octo.training.coment;
 
 
 public abstract class ControllerBase  {

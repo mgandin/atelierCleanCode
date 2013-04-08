@@ -14,7 +14,7 @@
 //
 //----------------------------------------------------------------------------79
 
-package com.octo.training.cmoment;
+package com.octo.training.coment;
 
 /**
  * @author
