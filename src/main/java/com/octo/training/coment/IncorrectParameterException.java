@@ -1,13 +1,11 @@
 //----------------------------------------------------------------------------79
-// SMILE
 //
-// @(#) $Header: /home/cvs/RefonteEspacePro/src/fr/smile/fwk/exceptions/IncorrectParameterException.java,v 1.2 2005/11/30 16:09:28 dahug Exp $
 //
 // Langage     : Java
 //
 // Description : 
 //
-// Auteur        : Arnaud Mary - SMILE
+// Auteur        : Mathieu Gandin - Octo
 // Date creation : 12 nov. 2003
 //
 // Historique    :

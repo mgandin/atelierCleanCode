@@ -1,9 +1,7 @@
 // ----------------------------------------------------------------------------79
-// SMILE
 //
 // @(#) $Header:
-// /home/cvs/RefonteEspacePro/src/fr/smile/fwk/base/ControllerBase.java,v 1.13
-// 2006/10/09 15:31:11 huray Exp $
+// 2006/10/09 15:31:11 yop Exp $
 //
 // Langage : Java
 //
@@ -11,7 +9,6 @@
 // R�le principal: fournir les points d'entr�es de validation
 // des informations envoy�es par la requ�te.
 //
-// Auteur : Beno�t Jacquemont
 // Date creation : Created on 3 septembre 2002, 10:24
 //
 // Historique :
