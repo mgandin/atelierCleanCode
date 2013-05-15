@@ -54,6 +54,8 @@ public class ControllerBaseAttributes {
 	 */
 	public boolean enableRedirectParam = false;
 
+    private Hashtable h;
+
 	/**
 	 * Constructeur de <code>ControllerBaseAttributes</code>
 	 */
@@ -73,14 +75,15 @@ public class ControllerBaseAttributes {
 	 * nouvelle instance de la classe CtrlAttributesxxx (ou xxx est le nom de
 	 * l'action), située dans le même package que le controleur en cours.
 	 */
-	public static ControllerBaseAttributes getInstance(HttpServletRequest req, SessionContainer sc,
+	public ControllerBaseAttributes getInstance(HttpServletRequest req, SessionContainer sc,
 			Class controllerClass) throws IncorrectParameterException {
 		ControllerBaseAttributes attributes = null;
 		boolean isMultipartContent = FileUploadBase.isMultipartContent(req);
-		List l = null;
-		String action = null;
-		Hashtable h = null;
+
+        String action = null;
+
 		if (isMultipartContent) {
+            List l = null;
 			// Retrieve multipart content
 			DefaultFileItemFactory dfif = new DefaultFileItemFactory();
 			FileUpload upload = new FileUpload(dfif);
@@ -96,19 +99,17 @@ public class ControllerBaseAttributes {
 					item = (DefaultFileItem) it.next();
 					h.put(item.getFieldName(), item);
 				}
-				// récupêre le paramêtre ACTION
-				FileItem fi = (FileItem) h.get(ControllerBase.ACTION_PARAMETER);
-				if (fi != null) {
-					action = fi.getString();
-				}
+                FileItem fi = (FileItem) h.get(ControllerBase.ACTION_PARAMETER);
+                if (fi != null) {
+                    action = fi.getString();
+                }
 			}
 			catch (FileUploadBase.SizeLimitExceededException slee) {
-				// Le fichier uploadé dépasse la taille maximale
-				sc.setMessageErreurKey("error.parameter.file_size");
-				if (logger.isDebugEnabled()) {
-					logger.debug("ControllerBaseAttributes", slee);
-				}
-				throw new IncorrectParameterException();
+                sc.setMessageErreurKey("error.parameter.file_size");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("ControllerBaseAttributes", slee);
+                }
+                throw new IncorrectParameterException();
 			}
 			catch (FileUploadException e) {
 				if (logger.isErrorEnabled()) {
@@ -126,42 +127,8 @@ public class ControllerBaseAttributes {
 		String className = controllerClass.getName();
 		// x7786 3.5 ACTION NULL ou vide
 		// envoi exception pour stopper execution servlet
-		if (action == null || "".equals(action)) {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Le parametre action 'mth' n'est pas defini " + "pour le controleur " + className);
-			}
-			sc.setMessageErreurKey("error.action.null");
-			throw new IncorrectParameterException();
-		}
-		else {
-			int i = className.lastIndexOf(".");
-			className = className.substring(0, i + 1) + ControllerBase.CTRL_ATTRIBUTES_PREFIX + action;
-			try {
-				Class attributesClass = Class.forName(className);
-				attributes = (ControllerBaseAttributes) attributesClass.newInstance();
-			}
-			catch (ClassNotFoundException cnfe) {
-				if (logger.isWarnEnabled()) {
-					logger.warn("la classe " + className + " n'a pas été trouvée " + "pour gérer l'action " + action
-							+ " dans le controleur " + controllerClass.getName());
-				}
-				// x7786 3.X ACTION mal renseignée
-				// envoi exception pour stopper execution servlet
-				sc.setMessageErreurKey("error.action.wrong");
-				throw new IncorrectParameterException();
-			}
-			catch (IllegalAccessException iae) {
-				if (logger.isWarnEnabled()) {
-					logger.warn("", iae);
-				}
-			}
-			catch (InstantiationException ie) {
-				if (logger.isWarnEnabled()) {
-					logger.warn("", ie);
-				}
-			}
-		}
-		if (attributes == null) {
+        attributes = defaultExecution(sc, controllerClass, attributes, action, className);
+        if (attributes == null) {
 			attributes = new ControllerBaseAttributes();
 		}
 		if (isMultipartContent) {
@@ -170,6 +137,61 @@ public class ControllerBaseAttributes {
 		attributes.setAction(action);
 		return attributes;
 	}
+
+    private static ControllerBaseAttributes defaultExecution(SessionContainer sc, Class controllerClass, ControllerBaseAttributes attributes, String action, String className) throws IncorrectParameterException {
+        if (action == null || "".equals(action)) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("Le parametre action 'mth' n'est pas defini " + "pour le controleur " + className);
+            }
+            sc.setMessageErreurKey("error.action.null");
+            throw new IncorrectParameterException();
+        }
+        else {
+            int i = className.lastIndexOf(".");
+            className = className.substring(0, i + 1) + ControllerBase.CTRL_ATTRIBUTES_PREFIX + action;
+            try {
+                Class attributesClass = Class.forName(className);
+                attributes = (ControllerBaseAttributes) attributesClass.newInstance();
+            }
+            catch (ClassNotFoundException cnfe) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("la classe " + className + " n'a pas été trouvée " + "pour gérer l'action " + action
+                            + " dans le controleur " + controllerClass.getName());
+                }
+                // x7786 3.X ACTION mal renseignée
+                // envoi exception pour stopper execution servlet
+                sc.setMessageErreurKey("error.action.wrong");
+                throw new IncorrectParameterException();
+            }
+            catch (IllegalAccessException iae) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("", iae);
+                }
+            }
+            catch (InstantiationException ie) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("", ie);
+                }
+            }
+        }
+        return attributes;
+    }
+
+    private static ControllerBaseAttributes throwErrorUploadFileIsExceedMaxSize(SessionContainer sc, FileUploadBase.SizeLimitExceededException slee) throws IncorrectParameterException {
+        sc.setMessageErreurKey("error.parameter.file_size");
+        if (logger.isDebugEnabled()) {
+            logger.debug("ControllerBaseAttributes", slee);
+        }
+        throw new IncorrectParameterException();
+    }
+
+    private static String retrieveAction(String action, Hashtable h) {
+        FileItem fi = (FileItem) h.get(ControllerBase.ACTION_PARAMETER);
+        if (fi != null) {
+            action = fi.getString();
+        }
+        return action;
+    }
 
     private void setFileItems(Hashtable h) {
     }
